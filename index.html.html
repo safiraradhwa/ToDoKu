@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ToDoKu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cherry: #7B1E34;
+    --cherry-deep: #5C1527;
+    --cherry-soft: #E3C3CA;
+    --cherry-bg: #F8F0F1;
+    --matcha: #6B7356;
+    --matcha-deep: #4A5138;
+    --matcha-soft: #DADFC9;
+    --matcha-bg: #F2F4EB;
+    --easy-bg: #D9EBCB;
+    --easy-fg: #2E5A1C;
+    --medium-bg: #FBEDB0;
+    --medium-fg: #7A5600;
+    --hard-bg: #F6D0D0;
+    --hard-fg: #9A1B1B;
+    --cream: #FFFBF6;
+    --ink: #3B2E2A;
+    --ink-soft: #7A6A64;
+    --card: #FFFFFF;
+    --border: #EDE0DE;
+    --shadow: rgba(155, 60, 90, 0.12);
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  html{ scroll-padding-top:env(safe-area-inset-top,0px); }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --cherry: #D98FA0;
+      --cherry-deep: #E8ACB8;
+      --cherry-soft: #4A2530;
+      --cherry-bg: #251A1D;
+      --matcha: #A3AD8A;
+      --matcha-deep: #BFC8A8;
+      --matcha-soft: #3A3F2F;
+      --matcha-bg: #1C1F18;
+      --easy-bg: #2C4222;
+      --easy-fg: #A8DB8C;
+      --medium-bg: #4A3E12;
+      --medium-fg: #F0D460;
+      --hard-bg: #4E2121;
+      --hard-fg: #F4A0A0;
+      --cream: #17151A;
+      --ink: #F1E9E6;
+      --ink-soft: #B8ACA7;
+      --card: #221E22;
+      --border: #3A3236;
+      --shadow: rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --cherry: #D98FA0;
+    --cherry-deep: #E8ACB8;
+    --cherry-soft: #4A2530;
+    --cherry-bg: #251A1D;
+    --matcha: #A3AD8A;
+    --matcha-deep: #BFC8A8;
+    --matcha-soft: #3A3F2F;
+    --matcha-bg: #1C1F18;
+    --easy-bg: #2C4222;
+    --easy-fg: #A8DB8C;
+    --medium-bg: #4A3E12;
+    --medium-fg: #F0D460;
+    --hard-bg: #4E2121;
+    --hard-fg: #F4A0A0;
+    --cream: #17151A;
+    --ink: #F1E9E6;
+    --ink-soft: #B8ACA7;
+    --card: #221E22;
+    --border: #3A3236;
+    --shadow: rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 8% 8%, var(--cherry-bg) 0%, transparent 40%),
+      radial-gradient(circle at 92% 15%, var(--matcha-bg) 0%, transparent 45%),
+      var(--cream);
+    color:var(--ink);
+    font-family:'Nunito', sans-serif;
+    min-height:100%;
+    display:flex;
+    justify-content:center;
+    padding:40px 16px 80px;
+  }
+  h1,h2,h3,.brand{font-family:'Fredoka', sans-serif;}
+  button{font-family:inherit;}
+
+  .wrap{width:100%;max-width:640px;}
+
+  /* Storage warning banner */
+  .storage-warn{
+    display:none;
+    align-items:center;
+    gap:10px;
+    background:var(--cherry-bg);
+    border:1px solid var(--cherry-soft);
+    color:var(--cherry-deep);
+    padding:12px 14px;
+    border-radius:14px;
+    font-size:.85rem;
+    margin-bottom:18px;
+  }
+  .storage-warn.show{display:flex;}
+  .storage-warn button{
+    margin-left:auto;
+    border:none;background:none;color:var(--cherry-deep);
+    font-weight:700;cursor:pointer;font-size:.85rem;
+  }
+
+  header{margin-bottom:26px;}
+  .header-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .brand-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .brand{font-size:2.1rem;font-weight:700;margin:0;color:var(--cherry);letter-spacing:.2px;}
+  .brand em{color:var(--matcha);font-style:normal;}
+  .tagline{margin:6px 0 0;color:var(--ink-soft);font-size:.98rem;}
+  .greeting-line{margin:0 0 6px;font-size:.9rem;color:var(--matcha-deep);font-weight:700;}
+
+  .icon-btn{
+    border:none;
+    background:var(--card);
+    border:1px solid var(--border);
+    color:var(--ink-soft);
+    width:40px;height:40px;
+    border-radius:12px;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 3px 10px var(--shadow);
+    transition:all .15s ease;
+    flex-shrink:0;
+  }
+  .icon-btn:hover{color:var(--cherry);}
+  .icon-btn svg{width:19px;height:19px;}
+
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    margin-top:22px;
+  }
+  .stat{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:14px 12px;
+    text-align:center;
+    box-shadow:0 4px 14px var(--shadow);
+  }
+  .stat .num{font-family:'Fredoka';font-size:1.5rem;font-weight:600;color:var(--matcha-deep);}
+  .stat.cherry .num{color:var(--cherry-deep);}
+  .stat .label{font-size:.75rem;color:var(--ink-soft);margin-top:2px;}
+
+  .add-trigger{
+    width:100%;
+    margin-top:22px;
+    border:2px dashed var(--cherry-soft);
+    background:var(--cherry-bg);
+    color:var(--cherry);
+    font-family:'Fredoka';
+    font-weight:600;
+    font-size:1rem;
+    padding:15px;
+    border-radius:16px;
+    cursor:pointer;
+    transition:all .15s ease;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+  .add-trigger:hover{background:var(--cherry-soft);}
+
+  .search-row{position:relative;margin-top:16px;}
+  .search-row svg{
+    position:absolute;left:14px;top:50%;transform:translateY(-50%);
+    width:16px;height:16px;color:var(--ink-soft);pointer-events:none;
+  }
+  .search-row input{
+    width:100%;
+    border:2px solid var(--border);
+    border-radius:12px;
+    padding:11px 14px 11px 38px;
+    font-family:'Nunito';
+    font-size:.92rem;
+    background:var(--card);
+    color:var(--ink);
+    outline:none;
+    transition:border-color .15s ease;
+  }
+  .search-row input:focus{border-color:var(--matcha);}
+
+  .filters{display:flex;gap:6px;margin:16px 0 6px;flex-wrap:wrap;align-items:center;}
+  .filter-btn{
+    border:none;
+    background:transparent;
+    color:var(--ink-soft);
+    font-family:'Nunito';
+    font-weight:700;
+    font-size:.85rem;
+    padding:7px 14px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .filter-btn.active{background:var(--matcha-soft);color:var(--matcha-deep);}
+  .sort-note{
+    margin-left:auto;
+    font-size:.72rem;
+    color:var(--ink-soft);
+    display:flex;align-items:center;gap:4px;
+  }
+
+  .group{margin-bottom:22px;margin-top:16px;}
+  .group-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:'Fredoka';
+    font-size:.95rem;
+    font-weight:600;
+    color:var(--matcha-deep);
+    margin-bottom:10px;
+    padding-left:2px;
+  }
+  .group-title .count{
+    font-family:'Nunito';
+    font-weight:700;
+    font-size:.72rem;
+    color:var(--ink-soft);
+    background:var(--matcha-bg);
+    padding:2px 9px;
+    border-radius:999px;
+  }
+
+  .list{display:flex;flex-direction:column;gap:10px;}
+  .task{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:13px 14px;
+    box-shadow:0 3px 10px var(--shadow);
+    transition:opacity .2s ease, box-shadow .15s ease;
+  }
+  .task.dragging{opacity:.4;}
+  .task.drag-over{box-shadow:0 0 0 2px var(--matcha) inset;}
+  .drag-handle{
+    cursor:grab;
+    color:var(--ink-soft);
+    opacity:.5;
+    padding:4px 2px;
+    margin-top:2px;
+    touch-action:none;
+    display:none;
+  }
+  .drag-handle.enabled{display:block;}
+  .drag-handle svg{width:14px;height:14px;}
+  .check{
+    width:26px;height:26px;min-width:26px;
+    border-radius:50%;
+    border:2.5px solid var(--matcha);
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    background:transparent;
+    transition:all .15s ease;
+    margin-top:1px;
+  }
+  .check svg{width:14px;height:14px;opacity:0;transition:opacity .1s;}
+  .task.done .check{background:var(--matcha);}
+  .task.done .check svg{opacity:1;}
+  .task-body{flex:1;min-width:0;}
+  .task-text{font-size:.98rem;line-height:1.3;word-break:break-word;}
+  .task.done .task-text{text-decoration:line-through;color:var(--ink-soft);}
+  .chip-row{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap;}
+  .badge{
+    font-family:'Fredoka';
+    font-size:.68rem;
+    font-weight:600;
+    padding:4px 10px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .badge.easy{background:var(--easy-bg);color:var(--easy-fg);}
+  .badge.medium{background:var(--medium-bg);color:var(--medium-fg);}
+  .badge.hard{background:var(--hard-bg);color:var(--hard-fg);}
+  .badge.date{background:var(--matcha-bg);color:var(--matcha-deep);}
+  .badge.date.overdue{background:var(--cherry);color:#fff;}
+  .task-actions{display:flex;gap:2px;flex-shrink:0;}
+  .mini-btn{
+    border:none;background:transparent;cursor:pointer;
+    color:var(--ink-soft);
+    padding:4px;
+    display:flex;
+    opacity:.6;
+    transition:opacity .15s ease, color .15s ease;
+    margin-top:1px;
+  }
+  .mini-btn:hover{opacity:1;}
+  .mini-btn.edit-btn:hover{color:var(--matcha-deep);}
+  .mini-btn.del-btn:hover{color:var(--cherry);}
+  .mini-btn svg{width:16px;height:16px;}
+
+  .empty{
+    text-align:center;
+    padding:50px 20px;
+    color:var(--ink-soft);
+  }
+  .empty .emoji{font-size:2.4rem;display:block;margin-bottom:10px;}
+  .empty p{margin:0;font-size:.92rem;}
+
+  .overlay{
+    position:fixed;inset:0;
+    background:rgba(30,20,20,.45);
+    backdrop-filter:blur(3px);
+    display:flex;align-items:center;justify-content:center;
+    padding:20px;
+    z-index:50;
+    opacity:0;pointer-events:none;
+    transition:opacity .2s ease;
+    overflow-y:auto;
+  }
+  .overlay.show{opacity:1;pointer-events:auto;}
+
+  .popup{
+    background:var(--card);
+    border-radius:24px;
+    padding:32px 26px;
+    max-width:340px;
+    width:100%;
+    text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,.25);
+    transform:scale(.85) translateY(10px);
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+    position:relative;
+    overflow:hidden;
+  }
+  .overlay.show .popup{transform:scale(1) translateY(0);}
+  .popup .icon{font-size:2.8rem;display:block;margin-bottom:6px;}
+  .popup h2{margin:6px 0 4px;font-size:1.3rem;color:var(--cherry);}
+  .popup.all-done h2{color:var(--matcha-deep);}
+  .popup p.msg{margin:0 0 18px;font-size:.95rem;color:var(--ink-soft);line-height:1.4;}
+  .popup-close{
+    border:none;
+    background:var(--cherry);
+    color:#fff;
+    font-family:'Fredoka';
+    font-weight:600;
+    font-size:.92rem;
+    padding:10px 26px;
+    border-radius:12px;
+    cursor:pointer;
+    transition:transform .12s ease, background .15s ease;
+  }
+  .popup-close:hover{background:var(--cherry-deep);}
+  .popup-close:active{transform:scale(.96);}
+
+  .petal{
+    position:absolute;
+    top:-20px;
+    font-size:1.1rem;
+    animation:fall linear forwards;
+    pointer-events:none;
+  }
+  @keyframes fall{ to{ transform:translateY(340px) rotate(360deg); opacity:0; } }
+  @media (prefers-reduced-motion: reduce){
+    .petal{ animation:none !important; display:none !important; }
+  }
+
+  /* Confirm dialog */
+  .confirm-popup{
+    background:var(--card);
+    border-radius:22px;
+    padding:26px;
+    max-width:320px;
+    width:100%;
+    text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,.25);
+    transform:scale(.9);
+    transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+  }
+  .overlay.show .confirm-popup{transform:scale(1);}
+  .confirm-popup p{margin:0 0 20px;font-size:.95rem;color:var(--ink);line-height:1.4;}
+  .confirm-actions{display:flex;gap:10px;}
+  .confirm-actions button{
+    flex:1;border:none;border-radius:12px;padding:11px;
+    font-family:'Fredoka';font-weight:600;font-size:.92rem;cursor:pointer;
+  }
+  .confirm-cancel{background:var(--cream);color:var(--ink-soft);border:2px solid var(--border) !important;}
+  .confirm-ok{background:var(--cherry);color:#fff;}
+
+  /* Toast */
+  .toast{
+    position:fixed;
+    left:50%;bottom:24px;
+    transform:translate(-50%, 20px);
+    background:var(--ink);
+    color:var(--cream);
+    padding:12px 16px;
+    border-radius:14px;
+    font-size:.88rem;
+    display:flex;align-items:center;gap:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+    opacity:0;pointer-events:none;
+    transition:all .25s ease;
+    z-index:80;
+    max-width:90vw;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto;}
+  .toast button{
+    border:none;background:none;color:var(--cherry-soft);
+    font-family:'Fredoka';font-weight:600;font-size:.86rem;cursor:pointer;
+    white-space:nowrap;
+  }
+
+  .modal{
+    background:var(--card);
+    border-radius:24px;
+    padding:26px;
+    max-width:400px;
+    width:100%;
+    box-shadow:0 20px 50px rgba(0,0,0,.25);
+    transform:scale(.9) translateY(10px);
+    transition:transform .22s cubic-bezier(.34,1.56,.64,1);
+    max-height:90vh;
+    overflow-y:auto;
+  }
+  .overlay.show .modal{transform:scale(1) translateY(0);}
+  .modal h2{margin:0 0 16px;font-size:1.2rem;color:var(--cherry);}
+  .field-label{
+    font-family:'Fredoka';
+    font-size:.78rem;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin:14px 0 8px;
+  }
+  .field-label:first-of-type{margin-top:0;}
+  .modal input[type=text], .modal input[type=date]{
+    width:100%;
+    border:2px solid var(--border);
+    border-radius:12px;
+    padding:11px 14px;
+    font-family:'Nunito';
+    font-size:.98rem;
+    background:var(--cream);
+    color:var(--ink);
+    outline:none;
+    transition:border-color .15s ease;
+  }
+  .modal input[type=text]:focus, .modal input[type=date]:focus{border-color:var(--matcha);}
+  .pill-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .pill{
+    flex:1 1 auto;
+    min-width:70px;
+    border:2px solid var(--border);
+    background:var(--cream);
+    color:var(--ink-soft);
+    border-radius:12px;
+    padding:9px 6px;
+    font-family:'Nunito';
+    font-weight:700;
+    font-size:.83rem;
+    cursor:pointer;
+    text-align:center;
+    transition:all .15s ease;
+  }
+  .pill[data-diff="easy"].active{background:var(--easy-bg);border-color:var(--easy-fg);color:var(--easy-fg);}
+  .pill[data-diff="medium"].active{background:var(--medium-bg);border-color:var(--medium-fg);color:var(--medium-fg);}
+  .pill[data-diff="hard"].active{background:var(--hard-bg);border-color:var(--hard-fg);color:var(--hard-fg);}
+  .pill[data-cat].active{background:var(--matcha-soft);border-color:var(--matcha);color:var(--matcha-deep);}
+  .pill[data-theme-opt].active{background:var(--matcha-soft);border-color:var(--matcha);color:var(--matcha-deep);}
+  .pill.add-new{border-style:dashed;color:var(--cherry);border-color:var(--cherry-soft);flex:0 0 auto;padding:9px 14px;}
+  .pill.add-new:hover{background:var(--cherry-bg);}
+
+  .new-cat-box{
+    margin-top:10px;
+    padding:14px;
+    border-radius:14px;
+    background:var(--matcha-bg);
+    border:1px solid var(--border);
+    display:none;
+  }
+  .new-cat-box.show{display:block;}
+  .new-cat-box input[type=text]{margin-bottom:8px;}
+  .cat-error{font-size:.78rem;color:var(--cherry-deep);margin:0 0 8px;display:none;}
+  .cat-error.show{display:block;}
+  .emoji-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+  .emoji-opt{
+    width:36px;height:36px;
+    border-radius:10px;
+    border:2px solid var(--border);
+    background:var(--card);
+    font-size:1.1rem;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .15s ease;
+  }
+  .emoji-opt.active{border-color:var(--matcha);background:var(--matcha-soft);}
+  .new-cat-actions{display:flex;gap:8px;}
+  .new-cat-actions button{
+    flex:1;
+    border:none;
+    border-radius:10px;
+    padding:9px;
+    font-family:'Fredoka';
+    font-weight:600;
+    font-size:.85rem;
+    cursor:pointer;
+  }
+  .btn-confirm-cat{background:var(--matcha);color:#fff;}
+  .btn-cancel-cat{background:var(--card);color:var(--ink-soft);border:2px solid var(--border) !important;}
+
+  .modal-actions{display:flex;gap:10px;margin-top:22px;}
+  .btn-cancel, .btn-save{
+    flex:1;
+    border:none;
+    border-radius:12px;
+    padding:11px;
+    font-family:'Fredoka';
+    font-weight:600;
+    font-size:.95rem;
+    cursor:pointer;
+    transition:transform .12s ease, background .15s ease;
+  }
+  .btn-cancel{background:var(--cream);color:var(--ink-soft);border:2px solid var(--border);}
+  .btn-cancel:hover{background:var(--border);}
+  .btn-save{background:var(--cherry);color:#fff;}
+  .btn-save:hover{background:var(--cherry-deep);}
+  .btn-save:active, .btn-cancel:active{transform:scale(.97);}
+
+  /* Settings modal specifics */
+  .settings-section{margin-bottom:20px;}
+  .settings-section:last-of-type{margin-bottom:0;}
+  .cat-manage-row{
+    display:flex;align-items:center;gap:8px;
+    padding:8px 10px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    margin-bottom:8px;
+    background:var(--cream);
+  }
+  .cat-manage-row input[type=text]{
+    flex:1;border:none;background:transparent;padding:4px 2px;font-family:'Nunito';font-weight:700;font-size:.88rem;color:var(--ink);outline:none;
+  }
+  .cat-manage-row .mini-btn{margin-top:0;}
+  .toggle-row{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:10px;
+    padding:10px 12px;
+    background:var(--cream);
+    border:1px solid var(--border);
+    border-radius:12px;
+  }
+  .toggle-row span{font-size:.88rem;font-weight:700;color:var(--ink);}
+  .switch{
+    position:relative;width:42px;height:24px;flex-shrink:0;
+    background:var(--border);border-radius:999px;cursor:pointer;
+    transition:background .15s ease;border:none;
+  }
+  .switch.on{background:var(--matcha);}
+  .switch::after{
+    content:'';position:absolute;top:3px;left:3px;
+    width:18px;height:18px;border-radius:50%;background:#fff;
+    transition:transform .15s ease;
+  }
+  .switch.on::after{transform:translateX(18px);}
+  .backup-btns{display:flex;gap:8px;}
+  .backup-btns button{
+    flex:1;border:2px solid var(--border);background:var(--cream);color:var(--ink);
+    font-family:'Fredoka';font-weight:600;font-size:.85rem;padding:10px;border-radius:12px;cursor:pointer;
+  }
+  .backup-btns button:hover{border-color:var(--matcha);}
+  .settings-hint{font-size:.75rem;color:var(--ink-soft);margin-top:8px;line-height:1.4;}
+
+  footer{
+    text-align:center;
+    margin-top:34px;
+    font-size:.78rem;
+    color:var(--ink-soft);
+  }
+
+  /* Link badge */
+  .badge.link{background:var(--cherry-bg);color:var(--cherry-deep);text-decoration:none;cursor:pointer;}
+  .badge.link:hover{background:var(--cherry-soft);}
+
+  /* View toggle */
+  .view-toggle{display:flex;gap:6px;margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:4px;}
+  .view-btn{flex:1;border:none;background:transparent;color:var(--ink-soft);font-family:'Fredoka';font-weight:600;font-size:.88rem;padding:9px;border-radius:10px;cursor:pointer;transition:all .15s ease;}
+  .view-btn.active{background:var(--matcha-soft);color:var(--matcha-deep);}
+
+  /* Calendar */
+  .cal-wrap{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:16px;box-shadow:0 4px 14px var(--shadow);}
+  .cal-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .cal-header h3{flex:1;margin:0;font-size:1.05rem;color:var(--cherry);text-align:center;}
+  .cal-nav{width:34px;height:34px;border:1px solid var(--border);background:var(--cream);color:var(--ink);border-radius:10px;cursor:pointer;font-size:1.1rem;line-height:1;}
+  .cal-nav:hover{border-color:var(--matcha);}
+  .cal-today-btn{border:1px solid var(--border);background:var(--cream);color:var(--matcha-deep);font-family:'Fredoka';font-weight:600;font-size:.75rem;padding:0 10px;height:34px;border-radius:10px;cursor:pointer;}
+  .cal-weekdays,.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .cal-weekdays span{text-align:center;font-size:.7rem;font-weight:700;color:var(--ink-soft);padding:4px 0;}
+  .cal-cell{aspect-ratio:1/1;min-height:44px;border:1px solid transparent;background:var(--cream);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--ink);font-family:'Nunito';padding:2px;}
+  .cal-cell.empty{background:transparent;cursor:default;}
+  .cal-cell:not(.empty):hover{border-color:var(--matcha);}
+  .cal-cell.today{border-color:var(--cherry-soft);}
+  .cal-cell.today .cal-num{color:var(--cherry);font-weight:800;}
+  .cal-cell.selected{background:var(--matcha-soft);border-color:var(--matcha);}
+  .cal-num{font-size:.85rem;font-weight:700;}
+  .cal-dots{display:flex;gap:2px;align-items:center;height:8px;}
+  .cal-dot{width:6px;height:6px;border-radius:50%;}
+  .cal-dot.pending{background:var(--matcha);}
+  .cal-dot.overdue{background:var(--cherry);}
+  .cal-dot.done{background:var(--ink-soft);opacity:.45;}
+  .cal-more{font-size:.58rem;color:var(--ink-soft);font-weight:700;}
+  .cal-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;font-size:.7rem;color:var(--ink-soft);}
+  .cal-legend span{display:flex;align-items:center;gap:5px;}
+  .cal-day-panel{margin-top:18px;padding-top:16px;border-top:1px solid var(--border);}
+  .cal-day-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
+  .cal-day-head h4{margin:0;font-family:'Fredoka';font-size:.95rem;color:var(--matcha-deep);}
+  .cal-add-btn{border:none;background:var(--cherry);color:#fff;font-family:'Fredoka';font-weight:600;font-size:.78rem;padding:7px 12px;border-radius:10px;cursor:pointer;white-space:nowrap;}
+  .cal-add-btn:hover{background:var(--cherry-deep);}
+
+  /* Trash / riwayat */
+  .trash-row{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;background:var(--cream);}
+  .trash-row .t-body{flex:1;min-width:0;}
+  .trash-row .t-text{font-size:.9rem;word-break:break-word;}
+  .trash-row .t-meta{font-size:.7rem;color:var(--ink-soft);margin-top:4px;}
+  .trash-row button{border:none;background:transparent;cursor:pointer;font-size:.78rem;font-weight:700;font-family:'Nunito';padding:5px 8px;border-radius:8px;white-space:nowrap;}
+  .restore-btn{color:var(--matcha-deep);}
+  .restore-btn:hover{background:var(--matcha-soft);}
+  .purge-btn{color:var(--cherry);}
+  .purge-btn:hover{background:var(--cherry-bg);}
+
+  /* Welcome screen */
+  .welcome{
+    position:fixed;inset:0;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:
+      radial-gradient(circle at 15% 20%, var(--cherry-bg) 0%, transparent 45%),
+      radial-gradient(circle at 85% 80%, var(--matcha-bg) 0%, transparent 50%),
+      var(--cream);
+    transition:opacity .35s ease;
+    overflow:hidden;
+  }
+  .welcome.hide{opacity:0;pointer-events:none;}
+  .welcome-card{max-width:380px;width:100%;text-align:center;position:relative;z-index:2;}
+  .welcome-emoji{font-size:3rem;margin-bottom:6px;display:block;}
+  .welcome-greeting{font-family:'Fredoka';font-size:1.6rem;font-weight:600;color:var(--cherry);margin:0 0 6px;}
+  .welcome-sub{color:var(--ink-soft);font-size:.98rem;margin:0 0 26px;line-height:1.5;}
+  .welcome-card input[type=text]{
+    width:100%;border:2px solid var(--border);border-radius:14px;padding:13px 16px;
+    font-family:'Nunito';font-size:1rem;background:var(--card);color:var(--ink);
+    outline:none;text-align:center;transition:border-color .15s ease;
+  }
+  .welcome-card input[type=text]:focus{border-color:var(--matcha);}
+  .welcome-start{
+    width:100%;margin-top:14px;border:none;background:var(--cherry);color:#fff;
+    font-family:'Fredoka';font-weight:600;font-size:1rem;padding:14px;border-radius:14px;
+    cursor:pointer;transition:transform .12s ease, background .15s ease;
+  }
+  .welcome-start:hover{background:var(--cherry-deep);}
+  .welcome-start:active{transform:scale(.97);}
+  .welcome-skip{
+    display:inline-block;margin-top:14px;background:none;border:none;color:var(--ink-soft);
+    font-family:'Nunito';font-weight:700;font-size:.85rem;cursor:pointer;text-decoration:underline;
+  }
+  
+
+  .sr-only{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0,0,0,0);white-space:nowrap;border:0;
+  }
+  /* ===== TAMPILAN FULL LAYAR ===== */
+body{
+  display:block;
+  padding:32px clamp(16px, 4vw, 56px) 80px;
+}
+
+.wrap{
+  width:100%;
+  max-width:none;
+}
+
+/* Kategori tersusun berdampingan */
+#groups{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(340px, 1fr));
+  gap:0 24px;
+  align-items:start;
+}
+#groups > .empty{
+  grid-column:1 / -1;
+}
+
+/* Kotak kalender ikut melebar */
+.cal-cell{
+  aspect-ratio:auto;
+  min-height:clamp(48px, 9vh, 88px);
+}
+</style>
+</head>
+<body>
+
+<div class="welcome" id="welcomeScreen">
+  <div class="welcome-card">
+    <h1 class="welcome-greeting" id="welcomeGreeting">Selamat datang!</h1>
+    <p class="welcome-sub">Sebelum mulai, Tulis namamu di bawah ini supaya ToDoKu bisa menyapu dengan lebih akrab setiap hari!.</p>
+    <input type="text" id="welcomeNameInput" placeholder="Tulis namamu..." maxlength="30">
+    <button class="welcome-start" id="welcomeStartBtn">Mulai ✨</button>
+    <br>
+    <button class="welcome-skip" id="welcomeSkipBtn">Lewati aja</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="storage-warn" id="storageWarn">
+    <span>⚠️ Penyimpanan browser tidak bisa diakses (mode privat?). Tugasmu <strong>tidak akan tersimpan</strong> setelah tab ditutup.</span>
+    <button id="storageWarnClose" aria-label="Tutup peringatan">✕</button>
+  </div>
+
+  <header>
+    <div class="header-top">
+      <div>
+        <p class="greeting-line" id="greetingLine"></p>
+        <div class="brand-row">
+          <h1 class="brand">ToDoKu</h1>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0;">
+      <button class="icon-btn" id="trashBtn" aria-label="Riwayat tugas dihapus" style="position:relative;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+          <path d="M10 11v6"></path><path d="M14 11v6"></path>
+          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+        </svg>
+        <span id="trashBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--cherry);color:#fff;font-size:.62rem;font-weight:700;min-width:16px;height:16px;border-radius:999px;align-items:center;justify-content:center;padding:0 3px;"></span>
+      </button>
+      <button class="icon-btn" id="settingsBtn" aria-label="Pengaturan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat cherry">
+        <div class="num" id="statStreak">0</div>
+        <div class="label">Hari beruntun</div>
+      </div>
+      <div class="stat">
+        <div class="num" id="statDone">0/0</div>
+        <div class="label">Selesai</div>
+      </div>
+    </div>
+  </header>
+
+  <button class="add-trigger" id="openAddBtn">＋ Tambah Tugas Baru</button>
+
+  <div class="view-toggle" id="viewToggle">
+    <button class="view-btn active" data-view="list" type="button">📋 Daftar</button>
+    <button class="view-btn" data-view="calendar" type="button">📅 Kalender</button>
+  </div>
+
+  <div id="listView">
+  <div class="search-row">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    <input type="text" id="searchInput" placeholder="Cari tugas...">
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" data-filter="all">Semua</button>
+    <button class="filter-btn" data-filter="active">Belum Selesai</button>
+    <button class="filter-btn" data-filter="done">Selesai</button>
+    <span class="sort-note" id="sortNote"></span>
+  </div>
+
+  <div id="groups"></div>
+  </div>
+
+  <div id="calendarView" style="display:none;">
+    <div class="cal-wrap">
+      <div class="cal-header">
+        <button class="cal-nav" id="calPrev" type="button" aria-label="Bulan sebelumnya">‹</button>
+        <h3 id="calTitle"></h3>
+        <button class="cal-nav" id="calNext" type="button" aria-label="Bulan berikutnya">›</button>
+        <button class="cal-today-btn" id="calToday" type="button">Hari ini</button>
+      </div>
+      <div class="cal-weekdays"><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span></div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-legend">
+        <span><i class="cal-dot pending"></i> Belum selesai</span>
+        <span><i class="cal-dot overdue"></i> Terlambat</span>
+        <span><i class="cal-dot done"></i> Selesai</span>
+      </div>
+      <div class="cal-day-panel">
+        <div class="cal-day-head">
+          <h4 id="calDayTitle"></h4>
+          <button class="cal-add-btn" id="calAddBtn" type="button">＋ Tugas di tanggal ini</button>
+        </div>
+        <div class="list" id="calDayList"></div>
+      </div>
+    </div>
+    <p class="settings-hint" style="text-align:center;margin-top:12px;">Tugas muncul di kalender kalau punya deadline.</p>
+  </div>
+
+  <footer>Tugasmu tersimpan otomatis di perangkat ini 🌿</footer>
+</div>
+
+<!-- Add / Edit task modal -->
+<div class="overlay" id="addOverlay">
+  <div class="modal" id="addModal">
+    <h2 id="modalTitle">Tugas Baru</h2>
+    <input type="text" id="taskInput" placeholder="Tulis tugas..." maxlength="120">
+
+    <div class="field-label">Tingkat kesulitan</div>
+    <div class="pill-row" id="diffRow">
+      <button class="pill" data-diff="easy" type="button">Easy</button>
+      <button class="pill active" data-diff="medium" type="button">Medium</button>
+      <button class="pill" data-diff="hard" type="button">Hard</button>
+    </div>
+
+    <div class="field-label">Kategori</div>
+    <div class="pill-row" id="catRow"></div>
+
+    <div class="new-cat-box" id="newCatBox">
+      <input type="text" id="newCatName" placeholder="Nama kategori, misal: Kuliah" maxlength="20">
+      <p class="cat-error" id="catError">Nama kategori itu sudah ada.</p>
+      <div class="emoji-row" id="emojiRow"></div>
+      <div class="new-cat-actions">
+        <button class="btn-cancel-cat" id="cancelNewCat" type="button">Batal</button>
+        <button class="btn-confirm-cat" id="confirmNewCat" type="button">Tambah Kategori</button>
+      </div>
+    </div>
+
+    <div class="field-label">Deadline (opsional)</div>
+    <input type="date" id="deadlineInput">
+
+    <div class="field-label">Link dokumen (opsional)</div>
+    <input type="text" id="linkInput" placeholder="https://..." maxlength="500">
+
+    <div class="modal-actions">
+      <button class="btn-cancel" id="cancelAddBtn" type="button">Batal</button>
+      <button class="btn-save" id="saveAddBtn" type="button">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="overlay" id="settingsOverlay">
+  <div class="modal" id="settingsModal">
+    <h2>Pengaturan</h2>
+
+    <div class="settings-section">
+      <div class="field-label" style="margin-top:0;">Nama kamu</div>
+      <input type="text" id="settingsNameInput" placeholder="Tulis namamu..." maxlength="30">
+    </div>
+
+    <div class="settings-section">
+      <div class="field-label" style="margin-top:0;">Tema</div>
+      <div class="pill-row" id="themeRow">
+        <button class="pill" data-theme-opt="system" type="button">💻 Sistem</button>
+        <button class="pill" data-theme-opt="light" type="button">☀️ Terang</button>
+        <button class="pill" data-theme-opt="dark" type="button">🌙 Gelap</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="field-label" style="margin-top:0;">Urutan tugas</div>
+      <div class="toggle-row">
+        <span>Urutkan otomatis berdasarkan deadline</span>
+        <button class="switch" id="autoSortSwitch" role="switch" aria-checked="true"></button>
+      </div>
+      <p class="settings-hint">Kalau dimatikan, kamu bisa urutkan tugas manual dengan cara tahan &amp; geser (drag) ikon ⠿ di kartu tugas.</p>
+    </div>
+
+    <div class="settings-section">
+      <div class="field-label" style="margin-top:0;">Kelola kategori</div>
+      <div id="catManageList"></div>
+      <p class="settings-hint">Menghapus kategori akan memindahkan tugas di dalamnya ke kategori pertama yang tersisa.</p>
+    </div>
+
+    <div class="settings-section">
+      <div class="field-label" style="margin-top:0;">Cadangkan data</div>
+      <div class="backup-btns">
+        <button id="exportBtn" type="button">⬇️ Ekspor</button>
+        <button id="importBtn" type="button">⬆️ Impor</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json,.json" class="sr-only">
+      <p class="settings-hint" id="exportHint">Simpan semua tugas &amp; kategori jadi file, buat jaga-jaga kalau ganti perangkat atau browser.</p>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-save" id="closeSettingsBtn" type="button" style="flex:none;width:100%;">Selesai</button>
+    </div>
+  </div>
+</div>
+
+<!-- Riwayat tugas dihapus -->
+<div class="overlay" id="trashOverlay">
+  <div class="modal" id="trashModal">
+    <h2>Riwayat Tugas Dihapus</h2>
+    <p class="settings-hint" style="margin:-8px 0 14px;">Tugas yang kamu hapus tersimpan di sini, dan bisa dipulihkan kapan saja.</p>
+    <div id="trashList"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="clearTrashBtn" type="button">Kosongkan</button>
+      <button class="btn-save" id="closeTrashBtn" type="button">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm dialog -->
+<div class="overlay" id="confirmOverlay">
+  <div class="confirm-popup">
+    <p id="confirmMsg">Yakin mau menghapus tugas ini?</p>
+    <div class="confirm-actions">
+      <button class="confirm-cancel" id="confirmCancelBtn" type="button">Batal</button>
+      <button class="confirm-ok" id="confirmOkBtn" type="button">Ya, Hapus</button>
+    </div>
+  </div>
+</div>
+
+<!-- Celebration popup -->
+<div class="overlay" id="celebOverlay">
+  <div class="popup" id="popup">
+    <span class="icon" id="popupIcon">🌸</span>
+    <h2 id="popupTitle">Kerja bagus!</h2>
+    <p class="msg" id="popupMsg">Satu tugas beres.</p>
+    <button class="popup-close" id="popupClose" type="button">Lanjut</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span id="toastMsg">Tugas dihapus.</span>
+  <button id="toastUndoBtn">Urungkan</button>
+</div>
+
+<script>
+(function(){
+  const DIFF = {
+    easy:   { label:'Easy' },
+    medium: { label:'Medium' },
+    hard:   { label:'Hard' }
+  };
+  const POPUP_ICON = { easy:'🍵', medium:'🌸', hard:'🍒' };
+
+  const EMOJI_CHOICES = ['🎓','💪','❤️','🐾','🛒','✈️','📚','🔖','💰','🎨','⚕️','🎮'];
+
+  const MESSAGES = {
+    easy: [
+      "Santai kayak seduh matcha, tapi tetap kelar!",
+      "Langkah kecil, tetap langkah maju.",
+      "Satu daun matcha lagi terpetik~"
+    ],
+    medium: [
+      "Manis-manis gitu, kamu tetap gigih!",
+      "Kelopak cherry lain berhasil mekar.",
+      "Kerja bagus, terus lanjut ya!"
+    ],
+    hard: [
+      "Wih, tugas berat pun kamu taklukkan!",
+      "Ini level cherry paling matang — mantap!",
+      "Kerja keras hari ini, hasil manis nanti."
+    ]
+  };
+
+  const STORAGE_KEY = 'cherry-matcha-todo-tasks';
+  const META_KEY = 'cherry-matcha-todo-meta';
+  const CATEGORIES_KEY = 'cherry-matcha-todo-categories';
+  const TRASH_KEY = 'cherry-matcha-todo-trash';
+  const NAME_KEY = 'cherry-matcha-todo-name';
+  const THEME_KEY = 'cherry-matcha-todo-theme';
+  const VISITED_KEY = 'cherry-matcha-todo-visited';
+
+  const DEFAULT_CATEGORIES = [
+    { key:'keluarga', label:'Keluarga', emoji:'👪' },
+    { key:'kantor',   label:'Kantor',   emoji:'💼' },
+    { key:'pribadi',  label:'Pribadi',  emoji:'🌸' },
+    { key:'rumah',    label:'Rumah',    emoji:'🏠' }
+  ];
+
+  let tasks = [];
+  let trash = [];
+  let currentView = 'list';
+  let calMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  let calSelected = null;
+  let meta = { streak: 0, lastActiveDate: null, autoSort: true };
+  let categories = [];
+  let currentFilter = 'all';
+  let searchTerm = '';
+  let selectedDiff = 'medium';
+  let selectedCat = '';
+  let selectedNewEmoji = EMOJI_CHOICES[0];
+  let editingTaskId = null; // null = add mode
+  let storageOk = true;
+  let dragTaskId = null;
+
+  // --- Storage helpers ---
+  function testStorage(){
+    try{
+      const k = '__cm_test__';
+      localStorage.setItem(k, '1');
+      localStorage.removeItem(k);
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function loadState(){
+    storageOk = testStorage();
+    if(!storageOk){
+      document.getElementById('storageWarn').classList.add('show');
+    }
+    try{
+      const t = localStorage.getItem(STORAGE_KEY);
+      tasks = t ? JSON.parse(t) : sampleTasks();
+    }catch(e){ tasks = sampleTasks(); }
+    try{
+      const m = localStorage.getItem(META_KEY);
+      meta = m ? Object.assign({streak:0,lastActiveDate:null,autoSort:true}, JSON.parse(m)) : meta;
+    }catch(e){ /* keep default */ }
+    try{
+      const c = localStorage.getItem(CATEGORIES_KEY);
+      categories = c ? JSON.parse(c) : DEFAULT_CATEGORIES.slice();
+    }catch(e){ categories = DEFAULT_CATEGORIES.slice(); }
+    if(!categories.length) categories = DEFAULT_CATEGORIES.slice();
+    try{
+      const tr = localStorage.getItem(TRASH_KEY);
+      trash = tr ? JSON.parse(tr) : [];
+      if(!Array.isArray(trash)) trash = [];
+    }catch(e){ trash = []; }
+  }
+
+  function sampleTasks(){
+    return [
+      { id: cryptoId(), text:'Telepon orang tua', diff:'easy', category:'keluarga', deadline:null, done:false },
+      { id: cryptoId(), text:'Kirim laporan mingguan', diff:'medium', category:'kantor', deadline:null, done:false },
+      { id: cryptoId(), text:'Baca buku 20 halaman', diff:'easy', category:'pribadi', deadline:null, done:false },
+      { id: cryptoId(), text:'Bersihkan dapur', diff:'medium', category:'rumah', deadline:null, done:false }
+    ];
+  }
+
+  function cryptoId(){
+    return 'id_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+  }
+
+  function saveState(){
+    saveLocalOnly();
+  }
+  function saveLocalOnly(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }catch(e){}
+    try{ localStorage.setItem(META_KEY, JSON.stringify(meta)); }catch(e){}
+    try{ localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories)); }catch(e){}
+    try{ localStorage.setItem(TRASH_KEY, JSON.stringify(trash)); }catch(e){}
+  }
+
+  function localDateStr(d){
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function todayStr(){ return localDateStr(new Date()); }
+
+  function bumpStreak(){
+    const today = todayStr();
+    if(meta.lastActiveDate === today) return;
+    const yesterday = localDateStr(new Date(Date.now() - 86400000));
+    meta.streak = (meta.lastActiveDate === yesterday) ? meta.streak + 1 : 1;
+    meta.lastActiveDate = today;
+  }
+
+  const MONTHS_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+  function formatDate(iso){
+    const [y,m,d] = iso.split('-').map(Number);
+    return d + ' ' + MONTHS_ID[m-1];
+  }
+  function isOverdue(iso){ return iso < todayStr(); }
+
+  function escapeHtml(str){
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  // ============ RENDERING ============
+  const groupsEl = document.getElementById('groups');
+  const statStreak = document.getElementById('statStreak');
+  const statDone = document.getElementById('statDone');
+  const sortNote = document.getElementById('sortNote');
+
+  function renderList(){
+    statStreak.textContent = meta.streak;
+    const doneCount = tasks.filter(t=>t.done).length;
+    statDone.textContent = doneCount + '/' + tasks.length;
+    sortNote.textContent = meta.autoSort ? '↕ Urut deadline' : '⠿ Urut manual';
+
+    let visible = tasks;
+    if(currentFilter === 'active') visible = visible.filter(t=>!t.done);
+    if(currentFilter === 'done') visible = visible.filter(t=>t.done);
+    if(searchTerm.trim()){
+      const q = searchTerm.trim().toLowerCase();
+      visible = visible.filter(t => t.text.toLowerCase().includes(q));
+    }
+
+    groupsEl.innerHTML = '';
+
+    if(tasks.length === 0){
+      groupsEl.innerHTML = `<div class="empty"><span class="emoji">🍃</span><p>Belum ada tugas. Tambahkan satu di atas!</p></div>`;
+      return;
+    }
+    if(visible.length === 0){
+      groupsEl.innerHTML = `<div class="empty"><span class="emoji">🍃</span><p>Tidak ada tugas yang cocok.</p></div>`;
+      return;
+    }
+
+    categories.forEach(cat => {
+      let catTasks = visible.filter(t => t.category === cat.key);
+      if(catTasks.length === 0) return;
+
+      if(meta.autoSort){
+        catTasks = catTasks.slice().sort((a,b) => {
+          if(a.deadline && b.deadline) return a.deadline < b.deadline ? -1 : (a.deadline > b.deadline ? 1 : 0);
+          if(a.deadline && !b.deadline) return -1;
+          if(!a.deadline && b.deadline) return 1;
+          return 0;
+        });
+      }
+
+      const groupDiv = document.createElement('div');
+      groupDiv.className = 'group';
+      groupDiv.innerHTML = `
+        <div class="group-title">
+          <span>${cat.emoji} ${escapeHtml(cat.label)}</span>
+          <span class="count">${catTasks.length}</span>
+        </div>
+        <div class="list" data-cat="${cat.key}"></div>
+      `;
+      const listEl = groupDiv.querySelector('.list');
+
+      catTasks.forEach(task => {
+        listEl.appendChild(buildTaskRow(task, { enableDrag: !meta.autoSort }));
+      });
+
+      groupsEl.appendChild(groupDiv);
+    });
+  }
+
+  function buildTaskRow(task, opts){
+    opts = opts || {};
+    const overdue = task.deadline && !task.done && isOverdue(task.deadline);
+    const row = document.createElement('div');
+    row.className = 'task' + (task.done ? ' done' : '');
+    row.dataset.id = task.id;
+    if(opts.enableDrag) row.draggable = true;
+    row.innerHTML = `
+      <span class="drag-handle${opts.enableDrag ? ' enabled' : ''}" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"></circle><circle cx="15" cy="6" r="1.5"></circle><circle cx="9" cy="12" r="1.5"></circle><circle cx="15" cy="12" r="1.5"></circle><circle cx="9" cy="18" r="1.5"></circle><circle cx="15" cy="18" r="1.5"></circle></svg>
+      </span>
+      <button class="check" aria-label="Tandai selesai">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </button>
+      <div class="task-body">
+        <div class="task-text">${escapeHtml(task.text)}</div>
+        <div class="chip-row">
+          <span class="badge ${task.diff}">${DIFF[task.diff].label}</span>
+          ${task.deadline ? `<span class="badge date${overdue ? ' overdue' : ''}">${overdue ? '⏰ Terlambat · ' : '📅 '}${formatDate(task.deadline)}</span>` : ''}
+        </div>
+      </div>
+      <div class="task-actions">
+        <button class="mini-btn edit-btn" aria-label="Ubah tugas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+        </button>
+        <button class="mini-btn del-btn" aria-label="Hapus tugas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+            <path d="M10 11v6"></path><path d="M14 11v6"></path>
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+          </svg>
+        </button>
+      </div>
+    `;
+
+    // Link dokumen (dibuat lewat DOM supaya aman, hanya http/https)
+    if(task.link && /^https?:\/\//i.test(task.link)){
+      const a = document.createElement('a');
+      a.className = 'badge link';
+      a.href = task.link;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = '🔗 Link';
+      a.title = task.link;
+      row.querySelector('.chip-row').appendChild(a);
+    }
+
+    row.querySelector('.check').addEventListener('click', () => toggleTask(task.id));
+    row.querySelector('.edit-btn').addEventListener('click', () => openEditModal(task.id));
+    row.querySelector('.del-btn').addEventListener('click', () => requestDeleteTask(task.id));
+
+    if(opts.enableDrag){
+      row.addEventListener('dragstart', (e) => {
+        dragTaskId = task.id;
+        row.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      row.addEventListener('dragend', () => {
+        row.classList.remove('dragging');
+        document.querySelectorAll('.task.drag-over').forEach(el => el.classList.remove('drag-over'));
+      });
+      row.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if(task.id !== dragTaskId) row.classList.add('drag-over');
+      });
+      row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+      row.addEventListener('drop', (e) => {
+        e.preventDefault();
+        row.classList.remove('drag-over');
+        if(dragTaskId && dragTaskId !== task.id) reorderTasks(dragTaskId, task.id);
+      });
+    }
+    return row;
+  }
+
+  function render(){
+    renderList();
+    renderTrashBadge();
+    if(currentView === 'calendar') renderCalendar();
+  }
+
+  function reorderTasks(draggedId, targetId){
+    const fromIdx = tasks.findIndex(t => t.id === draggedId);
+    const toIdx = tasks.findIndex(t => t.id === targetId);
+    if(fromIdx === -1 || toIdx === -1) return;
+    const [moved] = tasks.splice(fromIdx, 1);
+    tasks.splice(toIdx, 0, moved);
+    saveState();
+    render();
+  }
+
+  function toggleTask(id){
+    const task = tasks.find(t => t.id === id);
+    if(!task) return;
+    task.done = !task.done;
+    if(task.done){
+      bumpStreak();
+      saveState();
+      render();
+      showCelebration(task.diff);
+    } else {
+      saveState();
+      render();
+    }
+  }
+
+  // ============ DELETE + UNDO ============
+  const confirmOverlay = document.getElementById('confirmOverlay');
+  const confirmMsg = document.getElementById('confirmMsg');
+  const confirmOkBtn = document.getElementById('confirmOkBtn');
+  const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+  let pendingConfirmAction = null;
+
+  function showConfirm(message, onConfirm){
+    confirmMsg.textContent = message;
+    pendingConfirmAction = onConfirm;
+    openOverlay(confirmOverlay);
+  }
+  confirmOkBtn.addEventListener('click', () => {
+    const action = pendingConfirmAction;
+    pendingConfirmAction = null;
+    closeOverlay(confirmOverlay);
+    if(action) action();
+  });
+  confirmCancelBtn.addEventListener('click', () => {
+    pendingConfirmAction = null;
+    closeOverlay(confirmOverlay);
+  });
+
+  const toast = document.getElementById('toast');
+  const toastMsg = document.getElementById('toastMsg');
+  const toastUndoBtn = document.getElementById('toastUndoBtn');
+  let toastTimer = null;
+  let lastDeleted = null;
+
+  function showToast(message, undoFn){
+    toastMsg.textContent = message;
+    toastUndoBtn.style.display = undoFn ? '' : 'none';
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastUndoBtn.onclick = () => {
+      if(undoFn) undoFn();
+      hideToast();
+    };
+    toastTimer = setTimeout(hideToast, 5000);
+  }
+  function hideToast(){ toast.classList.remove('show'); }
+
+  function requestDeleteTask(id){
+    const task = tasks.find(t => t.id === id);
+    if(!task) return;
+    showConfirm(`Yakin mau menghapus "${task.text}"? Tugas akan masuk ke Riwayat.`, () => {
+      const idx = tasks.findIndex(t => t.id === id);
+      if(idx === -1) return;
+      const removed = tasks[idx];
+      tasks.splice(idx, 1);
+      const entry = { task: removed, deletedAt: Date.now() };
+      trash.unshift(entry);
+      if(trash.length > 100) trash.length = 100;
+      saveState();
+      render();
+      showToast('Tugas dipindah ke Riwayat.', () => {
+        const ti = trash.indexOf(entry);
+        if(ti !== -1) trash.splice(ti, 1);
+        tasks.splice(Math.min(idx, tasks.length), 0, removed);
+        saveState();
+        render();
+        renderTrashList();
+      });
+    });
+  }
+
+  // ============ CELEBRATION POPUP ============
+  const celebOverlay = document.getElementById('celebOverlay');
+  const popup = document.getElementById('popup');
+  const popupIcon = document.getElementById('popupIcon');
+  const popupTitle = document.getElementById('popupTitle');
+  const popupMsg = document.getElementById('popupMsg');
+  const popupClose = document.getElementById('popupClose');
+
+  function clearPetals(){ popup.querySelectorAll('.petal').forEach(p => p.remove()); }
+  function spawnPetals(emojis, count){
+    for(let i=0;i<count;i++){
+      const p = document.createElement('span');
+      p.className = 'petal';
+      p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      p.style.left = Math.random()*90 + '%';
+      p.style.animationDuration = (1.6 + Math.random()*1.2) + 's';
+      p.style.animationDelay = (Math.random()*0.6) + 's';
+      p.style.fontSize = (0.8 + Math.random()*0.8) + 'rem';
+      popup.appendChild(p);
+    }
+  }
+  function showCelebration(diff){
+    const allDone = tasks.length > 0 && tasks.every(t => t.done);
+    clearPetals();
+    popup.classList.remove('all-done');
+    if(allDone){
+      popup.classList.add('all-done');
+      popupIcon.textContent = '🎉';
+      popupTitle.textContent = 'Semua tugas selesai!';
+      popupMsg.textContent = 'Kamu berhasil menuntaskan seluruh daftar hari ini. Waktunya seduh matcha dan makan cherry sebagai hadiah!';
+      spawnPetals(['🍒','🍵','🌸'], 18);
+    } else {
+      const msgs = MESSAGES[diff];
+      popupIcon.textContent = POPUP_ICON[diff];
+      popupTitle.textContent = diff === 'hard' ? 'Mantap banget!' : (diff === 'medium' ? 'Kerja bagus!' : 'Sip, lanjut!');
+      popupMsg.textContent = msgs[Math.floor(Math.random()*msgs.length)];
+      spawnPetals(diff === 'hard' ? ['🍒','🌸'] : ['🍵','🌸'], diff === 'hard' ? 10 : 6);
+    }
+    openOverlay(celebOverlay);
+  }
+  popupClose.addEventListener('click', () => closeOverlay(celebOverlay));
+
+  // ============ OVERLAY / FOCUS HELPERS ============
+  const allOverlays = () => Array.from(document.querySelectorAll('.overlay'));
+  let lastFocused = null;
+
+  function openOverlay(el){
+    lastFocused = document.activeElement;
+    el.classList.add('show');
+    const focusable = el.querySelectorAll('input,button,[tabindex]');
+    if(focusable.length) setTimeout(() => focusable[0].focus(), 50);
+  }
+  function closeOverlay(el){
+    el.classList.remove('show');
+    if(lastFocused && lastFocused.focus) setTimeout(() => lastFocused.focus(), 0);
+  }
+  function topOverlay(){
+    const shown = allOverlays().filter(o => o.classList.contains('show'));
+    return shown[shown.length - 1] || null;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    const top = topOverlay();
+    if(!top) return;
+    if(e.key === 'Escape'){
+      if(top === confirmOverlay){ pendingConfirmAction = null; }
+      closeOverlay(top);
+      return;
+    }
+    if(e.key === 'Tab'){
+      const focusable = Array.from(top.querySelectorAll('input,button,[tabindex]')).filter(el => el.offsetParent !== null);
+      if(!focusable.length) return;
+      const first = focusable[0], last = focusable[focusable.length-1];
+      if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    }
+  });
+
+  allOverlays().forEach(ov => {
+    ov.addEventListener('click', (e) => { if(e.target === ov) closeOverlay(ov); });
+  });
+
+  // ============ ADD / EDIT TASK MODAL ============
+  const addOverlay = document.getElementById('addOverlay');
+  const modalTitle = document.getElementById('modalTitle');
+  const openAddBtn = document.getElementById('openAddBtn');
+  const cancelAddBtn = document.getElementById('cancelAddBtn');
+  const saveAddBtn = document.getElementById('saveAddBtn');
+  const taskInput = document.getElementById('taskInput');
+  const deadlineInput = document.getElementById('deadlineInput');
+  const linkInput = document.getElementById('linkInput');
+  const diffPills = document.querySelectorAll('#diffRow .pill');
+  const catRow = document.getElementById('catRow');
+  const newCatBox = document.getElementById('newCatBox');
+  const newCatName = document.getElementById('newCatName');
+  const catError = document.getElementById('catError');
+  const emojiRow = document.getElementById('emojiRow');
+  const cancelNewCat = document.getElementById('cancelNewCat');
+  const confirmNewCat = document.getElementById('confirmNewCat');
+
+  function renderEmojiRow(){
+    emojiRow.innerHTML = '';
+    EMOJI_CHOICES.forEach(em => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'emoji-opt' + (em === selectedNewEmoji ? ' active' : '');
+      btn.textContent = em;
+      btn.addEventListener('click', () => { selectedNewEmoji = em; renderEmojiRow(); });
+      emojiRow.appendChild(btn);
+    });
+  }
+
+  function categoryNameExists(label, excludeKey){
+    const norm = label.trim().toLowerCase();
+    return categories.some(c => c.key !== excludeKey && c.label.trim().toLowerCase() === norm);
+  }
+
+  function renderCategoryPills(){
+    catRow.innerHTML = '';
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'pill' + (cat.key === selectedCat ? ' active' : '');
+      btn.type = 'button';
+      btn.dataset.cat = cat.key;
+      btn.textContent = cat.emoji + ' ' + cat.label;
+      btn.addEventListener('click', () => { selectedCat = cat.key; renderCategoryPills(); });
+      catRow.appendChild(btn);
+    });
+    const addBtn = document.createElement('button');
+    addBtn.className = 'pill add-new';
+    addBtn.type = 'button';
+    addBtn.textContent = '+ Kategori';
+    addBtn.addEventListener('click', () => {
+      newCatBox.classList.toggle('show');
+      catError.classList.remove('show');
+      if(newCatBox.classList.contains('show')){
+        newCatName.value = '';
+        selectedNewEmoji = EMOJI_CHOICES[0];
+        renderEmojiRow();
+        setTimeout(() => newCatName.focus(), 50);
+      }
+    });
+    catRow.appendChild(addBtn);
+  }
+
+  cancelNewCat.addEventListener('click', () => { newCatBox.classList.remove('show'); catError.classList.remove('show'); });
+
+  confirmNewCat.addEventListener('click', () => {
+    const label = newCatName.value.trim();
+    if(!label){ newCatName.focus(); return; }
+    if(categoryNameExists(label)){
+      catError.classList.add('show');
+      newCatName.focus();
+      return;
+    }
+    catError.classList.remove('show');
+    const key = 'cat_' + Math.random().toString(36).slice(2);
+    categories.push({ key, label, emoji: selectedNewEmoji });
+    selectedCat = key;
+    saveState();
+    newCatBox.classList.remove('show');
+    renderCategoryPills();
+    renderCatManageList();
+  });
+
+  function openAddModal(presetDeadline){
+    editingTaskId = null;
+    modalTitle.textContent = 'Tugas Baru';
+    saveAddBtn.textContent = 'Simpan';
+    taskInput.value = '';
+    deadlineInput.value = presetDeadline || '';
+    linkInput.value = '';
+    selectedDiff = 'medium';
+    selectedCat = categories.length ? categories[0].key : '';
+    newCatBox.classList.remove('show');
+    diffPills.forEach(p => p.classList.toggle('active', p.dataset.diff === selectedDiff));
+    renderCategoryPills();
+    openOverlay(addOverlay);
+  }
+
+  function openEditModal(id){
+    const task = tasks.find(t => t.id === id);
+    if(!task) return;
+    editingTaskId = id;
+    modalTitle.textContent = 'Ubah Tugas';
+    saveAddBtn.textContent = 'Simpan Perubahan';
+    taskInput.value = task.text;
+    deadlineInput.value = task.deadline || '';
+    linkInput.value = task.link || '';
+    selectedDiff = task.diff;
+    selectedCat = task.category;
+    newCatBox.classList.remove('show');
+    diffPills.forEach(p => p.classList.toggle('active', p.dataset.diff === selectedDiff));
+    renderCategoryPills();
+    openOverlay(addOverlay);
+  }
+
+  function closeAddModal(){ closeOverlay(addOverlay); }
+  openAddBtn.addEventListener('click', () => openAddModal());
+  cancelAddBtn.addEventListener('click', closeAddModal);
+
+  diffPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      diffPills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      selectedDiff = pill.dataset.diff;
+    });
+  });
+
+  function normalizeLink(raw){
+    const val = raw.trim();
+    if(!val) return null;
+    return /^https?:\/\//i.test(val) ? val : 'https://' + val;
+  }
+
+  function submitAdd(){
+    const text = taskInput.value.trim();
+    if(!text) { taskInput.focus(); return; }
+    const link = normalizeLink(linkInput.value);
+
+    if(editingTaskId){
+      const task = tasks.find(t => t.id === editingTaskId);
+      if(task){
+        task.text = text;
+        task.diff = selectedDiff;
+        task.category = selectedCat;
+        task.deadline = deadlineInput.value || null;
+        task.link = link;
+      }
+    } else {
+      tasks.unshift({
+        id: cryptoId(), text, diff: selectedDiff, category: selectedCat,
+        deadline: deadlineInput.value || null, link: link, done:false
+      });
+    }
+    saveState();
+    render();
+    closeAddModal();
+  }
+  saveAddBtn.addEventListener('click', submitAdd);
+  taskInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') submitAdd(); });
+
+  // ============ FILTERS + SEARCH ============
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      render();
+    });
+  });
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    searchTerm = e.target.value;
+    render();
+  });
+
+  // ============ SETTINGS MODAL ============
+  const settingsOverlay = document.getElementById('settingsOverlay');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+  const settingsNameInput = document.getElementById('settingsNameInput');
+  const themeRow = document.getElementById('themeRow');
+  const autoSortSwitch = document.getElementById('autoSortSwitch');
+  const catManageList = document.getElementById('catManageList');
+  const exportBtn = document.getElementById('exportBtn');
+  const importBtn = document.getElementById('importBtn');
+  const importFile = document.getElementById('importFile');
+  const exportHint = document.getElementById('exportHint');
+
+  function getName(){
+    try{ return localStorage.getItem(NAME_KEY) || ''; }catch(e){ return ''; }
+  }
+  function setName(name){
+    try{ localStorage.setItem(NAME_KEY, name); }catch(e){}
+    updateGreetingLine();
+  }
+
+  settingsBtn.addEventListener('click', () => {
+    settingsNameInput.value = getName();
+    renderThemeRow();
+    autoSortSwitch.classList.toggle('on', meta.autoSort);
+    autoSortSwitch.setAttribute('aria-checked', String(meta.autoSort));
+    renderCatManageList();
+    openOverlay(settingsOverlay);
+  });
+  closeSettingsBtn.addEventListener('click', () => closeOverlay(settingsOverlay));
+  settingsNameInput.addEventListener('input', () => setName(settingsNameInput.value.trim()));
+
+  // Theme
+  function applyTheme(pref){
+    if(pref === 'system'){ document.documentElement.removeAttribute('data-theme'); }
+    else{ document.documentElement.setAttribute('data-theme', pref); }
+  }
+  function getThemePref(){
+    try{ return localStorage.getItem(THEME_KEY) || 'system'; }catch(e){ return 'system'; }
+  }
+  function setThemePref(pref){
+    try{ localStorage.setItem(THEME_KEY, pref); }catch(e){}
+    applyTheme(pref);
+    renderThemeRow();
+  }
+  function renderThemeRow(){
+    const current = getThemePref();
+    themeRow.querySelectorAll('.pill').forEach(p => {
+      p.classList.toggle('active', p.dataset.themeOpt === current);
+    });
+  }
+  themeRow.querySelectorAll('.pill').forEach(p => {
+    p.addEventListener('click', () => setThemePref(p.dataset.themeOpt));
+  });
+
+  // Auto-sort toggle
+  autoSortSwitch.addEventListener('click', () => {
+    meta.autoSort = !meta.autoSort;
+    autoSortSwitch.classList.toggle('on', meta.autoSort);
+    autoSortSwitch.setAttribute('aria-checked', String(meta.autoSort));
+    saveState();
+    render();
+  });
+
+  // Category management
+  function renderCatManageList(){
+    catManageList.innerHTML = '';
+    categories.forEach(cat => {
+      const row = document.createElement('div');
+      row.className = 'cat-manage-row';
+      row.innerHTML = `
+        <span>${cat.emoji}</span>
+        <input type="text" value="${escapeHtml(cat.label)}" maxlength="20" data-key="${cat.key}">
+        <button class="mini-btn del-btn" aria-label="Hapus kategori ${escapeHtml(cat.label)}" ${categories.length <= 1 ? 'disabled style="opacity:.25;cursor:not-allowed;"' : ''}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+            <path d="M10 11v6"></path><path d="M14 11v6"></path>
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+          </svg>
+        </button>
+      `;
+      const input = row.querySelector('input');
+      input.addEventListener('change', () => {
+        const newLabel = input.value.trim();
+        if(!newLabel){ input.value = cat.label; return; }
+        if(categoryNameExists(newLabel, cat.key)){
+          input.value = cat.label;
+          showToast('Nama kategori itu sudah dipakai.', null);
+          return;
+        }
+        cat.label = newLabel;
+        saveState();
+        render();
+      });
+      const delBtn = row.querySelector('.del-btn');
+      if(categories.length > 1){
+        delBtn.addEventListener('click', () => {
+          showConfirm(`Hapus kategori "${cat.label}"? Tugas di dalamnya akan dipindah ke kategori lain.`, () => {
+            const fallback = categories.find(c => c.key !== cat.key);
+            const movedCount = tasks.filter(t => t.category === cat.key).length;
+            tasks.forEach(t => { if(t.category === cat.key) t.category = fallback.key; });
+            categories = categories.filter(c => c.key !== cat.key);
+            saveState();
+            renderCatManageList();
+            render();
+            if(movedCount > 0){
+              showToast(`${movedCount} tugas dipindah ke "${fallback.label}".`, null);
+            }
+          });
+        });
+      }
+      catManageList.appendChild(row);
+    });
+  }
+
+  // ============ EXPORT / IMPORT (download standar browser) ============
+  exportBtn.addEventListener('click', () => {
+    const payload = { exportedAt: new Date().toISOString(), name: getName(), tasks, trash, categories, meta };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'todoku-backup.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast('File berhasil didownload.', null);
+  });
+
+  importBtn.addEventListener('click', () => importFile.click());
+  importFile.addEventListener('change', () => {
+    const file = importFile.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let data;
+      try{ data = JSON.parse(reader.result); }
+      catch(e){ showToast('File tidak valid.', null); importFile.value=''; return; }
+      if(!data || !Array.isArray(data.tasks) || !Array.isArray(data.categories)){
+        showToast('Format file tidak dikenali.', null);
+        importFile.value = '';
+        return;
+      }
+      showConfirm('Impor akan menggantikan semua tugas & kategori saat ini. Lanjutkan?', () => {
+        tasks = data.tasks;
+        trash = Array.isArray(data.trash) ? data.trash : [];
+        categories = data.categories.length ? data.categories : DEFAULT_CATEGORIES.slice();
+        if(data.meta) meta = Object.assign({streak:0,lastActiveDate:null,autoSort:true}, data.meta);
+        if(data.name) setName(data.name);
+        saveState();
+        render();
+        renderCatManageList();
+        showToast('Data berhasil diimpor.', null);
+      });
+      importFile.value = '';
+    };
+    reader.readAsText(file);
+  });
+
+  // ============ WELCOME SCREEN & GREETING ============
+  const welcomeScreen = document.getElementById('welcomeScreen');
+  const welcomeGreeting = document.getElementById('welcomeGreeting');
+  const welcomeNameInput = document.getElementById('welcomeNameInput');
+  const welcomeStartBtn = document.getElementById('welcomeStartBtn');
+  const welcomeSkipBtn = document.getElementById('welcomeSkipBtn');
+  const greetingLine = document.getElementById('greetingLine');
+
+  function timeGreetingWord(){
+    const h = new Date().getHours();
+    if(h < 11) return 'Selamat pagi';
+    if(h < 15) return 'Selamat siang';
+    if(h < 19) return 'Selamat sore';
+    return 'Selamat malam';
+  }
+  function updateGreetingLine(){
+    const name = getName();
+    greetingLine.textContent = timeGreetingWord() + (name ? ', ' + name + '!' : '!');
+  }
+  function closeWelcome(name){
+    if(name) setName(name);
+    updateGreetingLine();
+    welcomeScreen.classList.add('hide');
+    setTimeout(() => { welcomeScreen.style.display = 'none'; }, 400);
+  }
+  function initWelcome(){
+    let hasVisited = false;
+    try{ hasVisited = !!localStorage.getItem(VISITED_KEY); }catch(e){}
+    if(hasVisited){
+      welcomeScreen.style.display = 'none';
+      updateGreetingLine();
+      return;
+    }
+    welcomeGreeting.textContent = timeGreetingWord() + '!';
+    welcomeStartBtn.addEventListener('click', () => {
+      const name = welcomeNameInput.value.trim();
+      try{ localStorage.setItem(VISITED_KEY, '1'); }catch(e){}
+      closeWelcome(name);
+    });
+    welcomeSkipBtn.addEventListener('click', () => {
+      try{ localStorage.setItem(VISITED_KEY, '1'); }catch(e){}
+      closeWelcome('');
+    });
+    welcomeNameInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') welcomeStartBtn.click(); });
+  }
+
+  // ============ STORAGE WARNING BANNER ============
+  document.getElementById('storageWarnClose').addEventListener('click', () => {
+    document.getElementById('storageWarn').classList.remove('show');
+  });
+
+  // ============ CLOUD SYNC (db + user capabilities) ============
+  // ============ RIWAYAT TUGAS DIHAPUS ============
+  const trashOverlay = document.getElementById('trashOverlay');
+  const trashList = document.getElementById('trashList');
+  const trashBtn = document.getElementById('trashBtn');
+  const trashBadge = document.getElementById('trashBadge');
+  const closeTrashBtn = document.getElementById('closeTrashBtn');
+  const clearTrashBtn = document.getElementById('clearTrashBtn');
+
+  function pad2(n){ return String(n).padStart(2, '0'); }
+  function formatDateTime(ts){
+    const d = new Date(ts);
+    return d.getDate() + ' ' + MONTHS_ID[d.getMonth()] + ' ' + d.getFullYear() + ', ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+  }
+
+  function renderTrashBadge(){
+    if(trash.length){
+      trashBadge.style.display = 'flex';
+      trashBadge.textContent = trash.length > 99 ? '99+' : String(trash.length);
+    } else {
+      trashBadge.style.display = 'none';
+    }
+  }
+
+  function renderTrashList(){
+    trashList.innerHTML = '';
+    clearTrashBtn.disabled = trash.length === 0;
+    clearTrashBtn.style.opacity = trash.length === 0 ? '.5' : '1';
+    if(!trash.length){
+      trashList.innerHTML = '<div class="empty" style="padding:30px 10px;"><span class="emoji">🍃</span><p>Riwayat kosong. Belum ada tugas yang dihapus.</p></div>';
+      return;
+    }
+    trash.forEach(entry => {
+      const t = entry.task;
+      const cat = categories.find(c => c.key === t.category);
+      const row = document.createElement('div');
+      row.className = 'trash-row';
+      row.innerHTML = `
+        <div class="t-body">
+          <div class="t-text">${escapeHtml(t.text)}</div>
+          <div class="t-meta">${cat ? cat.emoji + ' ' + escapeHtml(cat.label) : '🔖 Lainnya'} · ${DIFF[t.diff] ? DIFF[t.diff].label : ''} · dihapus ${formatDateTime(entry.deletedAt)}</div>
+        </div>
+        <button class="restore-btn" type="button">↩ Pulihkan</button>
+        <button class="purge-btn" type="button" aria-label="Hapus permanen">✕</button>
+      `;
+      row.querySelector('.restore-btn').addEventListener('click', () => restoreFromTrash(t.id));
+      row.querySelector('.purge-btn').addEventListener('click', () => {
+        showConfirm('Hapus permanen tugas ini? Tindakan ini tidak bisa dibatalkan.', () => {
+          trash = trash.filter(e => e.task.id !== t.id);
+          saveState();
+          render();
+          renderTrashList();
+        });
+      });
+      trashList.appendChild(row);
+    });
+  }
+
+  function restoreFromTrash(id){
+    const idx = trash.findIndex(e => e.task.id === id);
+    if(idx === -1) return;
+    const entry = trash.splice(idx, 1)[0];
+    const task = entry.task;
+    if(!categories.some(c => c.key === task.category)) task.category = categories[0].key;
+    tasks.unshift(task);
+    saveState();
+    render();
+    renderTrashList();
+    showToast('Tugas dipulihkan.', null);
+  }
+
+  trashBtn.addEventListener('click', () => {
+    renderTrashList();
+    openOverlay(trashOverlay);
+  });
+  closeTrashBtn.addEventListener('click', () => closeOverlay(trashOverlay));
+  clearTrashBtn.addEventListener('click', () => {
+    if(!trash.length) return;
+    showConfirm('Kosongkan seluruh riwayat? Semua tugas di dalamnya akan hilang permanen.', () => {
+      trash = [];
+      saveState();
+      render();
+      renderTrashList();
+    });
+  });
+
+  // ============ KALENDER ============
+  const MONTHS_FULL = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const DAYS_FULL = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const calTitle = document.getElementById('calTitle');
+  const calGrid = document.getElementById('calGrid');
+  const calDayTitle = document.getElementById('calDayTitle');
+  const calDayList = document.getElementById('calDayList');
+  const listView = document.getElementById('listView');
+  const calendarView = document.getElementById('calendarView');
+
+  function dateKey(y, m, d){ return y + '-' + pad2(m + 1) + '-' + pad2(d); }
+
+  function renderCalendar(){
+    if(!calSelected) calSelected = todayStr();
+    const y = calMonth.getFullYear(), m = calMonth.getMonth();
+    calTitle.textContent = MONTHS_FULL[m] + ' ' + y;
+
+    const firstOffset = (new Date(y, m, 1).getDay() + 6) % 7; // minggu dimulai Senin
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    const byDate = {};
+    tasks.forEach(t => { if(t.deadline){ (byDate[t.deadline] = byDate[t.deadline] || []).push(t); } });
+    const today = todayStr();
+
+    calGrid.innerHTML = '';
+    for(let i = 0; i < firstOffset; i++){
+      const e = document.createElement('div');
+      e.className = 'cal-cell empty';
+      calGrid.appendChild(e);
+    }
+    for(let d = 1; d <= daysInMonth; d++){
+      const key = dateKey(y, m, d);
+      const dayTasks = byDate[key] || [];
+      const cell = document.createElement('button');
+      cell.type = 'button';
+      cell.className = 'cal-cell' + (key === today ? ' today' : '') + (key === calSelected ? ' selected' : '');
+      cell.setAttribute('aria-label', d + ' ' + MONTHS_FULL[m] + ' ' + y + (dayTasks.length ? ', ' + dayTasks.length + ' tugas' : ''));
+      let dots = '';
+      dayTasks.slice(0, 3).forEach(t => {
+        const cls = t.done ? 'done' : (key < today ? 'overdue' : 'pending');
+        dots += '<span class="cal-dot ' + cls + '"></span>';
+      });
+      if(dayTasks.length > 3) dots += '<span class="cal-more">+' + (dayTasks.length - 3) + '</span>';
+      cell.innerHTML = '<span class="cal-num">' + d + '</span><span class="cal-dots">' + dots + '</span>';
+      cell.addEventListener('click', () => { calSelected = key; renderCalendar(); });
+      calGrid.appendChild(cell);
+    }
+    renderCalendarDay(byDate[calSelected] || []);
+  }
+
+  function renderCalendarDay(dayTasks){
+    const parts = calSelected.split('-').map(Number);
+    const dow = new Date(parts[0], parts[1] - 1, parts[2]).getDay();
+    calDayTitle.textContent = DAYS_FULL[dow] + ', ' + parts[2] + ' ' + MONTHS_FULL[parts[1] - 1] + ' ' + parts[0];
+    calDayList.innerHTML = '';
+    if(!dayTasks.length){
+      calDayList.innerHTML = '<div class="empty" style="padding:24px 10px;"><p>Tidak ada tugas dengan deadline di tanggal ini.</p></div>';
+      return;
+    }
+    dayTasks.forEach(t => calDayList.appendChild(buildTaskRow(t, { enableDrag: false })));
+  }
+
+  document.getElementById('calPrev').addEventListener('click', () => {
+    calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() - 1, 1);
+    renderCalendar();
+  });
+  document.getElementById('calNext').addEventListener('click', () => {
+    calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 1);
+    renderCalendar();
+  });
+  document.getElementById('calToday').addEventListener('click', () => {
+    const now = new Date();
+    calMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    calSelected = todayStr();
+    renderCalendar();
+  });
+  document.getElementById('calAddBtn').addEventListener('click', () => {
+    openAddModal(calSelected || todayStr());
+  });
+
+  document.querySelectorAll('#viewToggle .view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentView = btn.dataset.view;
+      document.querySelectorAll('#viewToggle .view-btn').forEach(b => b.classList.toggle('active', b === btn));
+      listView.style.display = currentView === 'list' ? '' : 'none';
+      calendarView.style.display = currentView === 'calendar' ? '' : 'none';
+      render();
+    });
+  });
+
+  // ============ INIT ============
+  loadState();
+  applyTheme(getThemePref());
+  render();
+  initWelcome();
+})();
+</script>
+</body>
+</html>
